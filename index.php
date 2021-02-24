@@ -239,23 +239,23 @@
                     El pago se registró correctamente.
                 </div>
                 <?php } ?>
-                sdfsdkljf sdklfjsdkl klj
                 <table id="datatable" class="table dt-responsive nowrap w-100">
                     <thead>
-                    <tr>
-                        <th>No.</th>    
-                        <th>Cliente</th>
-                        <th>Método de pago</th>
-                        <th>Cantidad</th>
-                        <th>Datos de facturación</th>
-                        <th>Fecha de realización</th>
-                        <th>Nota</th>
-                    </tr>
+                        <tr>
+                            <th>No.</th>    
+                            <th>Cliente</th>
+                            <th>Método de pago</th>
+                            <th>Cantidad</th>
+                            <th>Datos de facturación</th>
+                            <th>Fecha de realización</th>
+                            <th>Nota</th>
+                        </tr>
                     </thead>
                     <tbody>
                     <?php 
                         $cnt = 0;
                         foreach($res as $row) {
+                            var_dump($row);
                     ?>
                         <tr>
                             <td width="5%"><?=++$cnt?></td>
