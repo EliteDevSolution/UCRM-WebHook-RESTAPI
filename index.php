@@ -259,17 +259,16 @@
                         <tr>
                             <td width="5%"><?=++$cnt?></td>
                             <td><?=$row['client_info']?></td>
-                            <td>sdklj
+                            <td>
                                 <?php
-                                    // if(mb_strpos(strtoupper($row['payment_method']), 'BANK TRANSFER') !== false || mb_strpos($row['payment_method'], 'Transferencia bancaria') !== false)
-                                    //     echo "Transferencia bancaria";
-                                    // else if(mb_strpos(strtoupper($row['payment_method']), 'CASH') !== false || mb_strpos($row['payment_method'], 'Efectivo') !== false)
-                                    //     echo "Efectivo";
-                                    // else if(mb_strpos(strtoupper($row['payment_method']), 'CHECK') !== false || mb_strpos($row['payment_method'], 'Cheque') !== false)
-                                    //     echo "Cheque";
-                                    // else 
-                                    //     echo $row['payment_method'];
+                                    if(strpos(strtoupper($row['payment_method']), 'BANK TRANSFER') !== false || strpos($row['payment_method'], 'Transferencia bancaria') !== false)
+                                        echo "Transferencia bancaria";
+                                    if(strpos(strtoupper($row['payment_method']), 'CASH') !== false || strpos($row['payment_method'], 'Efectivo') !== false)
+                                        echo "Efectivo";
+                                    if(strpos(strtoupper($row['payment_method']), 'CHECK') !== false || strpos($row['payment_method'], 'Cheque') !== false)
+                                        echo "Cheque";
                                 ?>
+                                sdkl
                             </td>
                             <td><?=$row['amount']?></td>
                             <td><?=str_replace('Nubmer:', '', $row['invoice_data'])?></td>
