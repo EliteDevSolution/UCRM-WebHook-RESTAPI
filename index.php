@@ -255,21 +255,20 @@
                     <?php 
                         $cnt = 0;
                         foreach($res as $row) {
-                            var_dump($row);
                     ?>
                         <tr>
                             <td width="5%"><?=++$cnt?></td>
                             <td><?=$row['client_info']?></td>
-                            <td>
+                            <td>sdklj
                                 <?php
-                                    if(mb_strpos(strtoupper($row['payment_method']), 'BANK TRANSFER') !== false || mb_strpos($row['payment_method'], 'Transferencia bancaria') !== false)
-                                        echo "Transferencia bancaria";
-                                    else if(mb_strpos(strtoupper($row['payment_method']), 'CASH') !== false || mb_strpos($row['payment_method'], 'Efectivo') !== false)
-                                        echo "Efectivo";
-                                    else if(mb_strpos(strtoupper($row['payment_method']), 'CHECK') !== false || mb_strpos($row['payment_method'], 'Cheque') !== false)
-                                        echo "Cheque";
-                                    else 
-                                        echo $row['payment_method'];
+                                    // if(mb_strpos(strtoupper($row['payment_method']), 'BANK TRANSFER') !== false || mb_strpos($row['payment_method'], 'Transferencia bancaria') !== false)
+                                    //     echo "Transferencia bancaria";
+                                    // else if(mb_strpos(strtoupper($row['payment_method']), 'CASH') !== false || mb_strpos($row['payment_method'], 'Efectivo') !== false)
+                                    //     echo "Efectivo";
+                                    // else if(mb_strpos(strtoupper($row['payment_method']), 'CHECK') !== false || mb_strpos($row['payment_method'], 'Cheque') !== false)
+                                    //     echo "Cheque";
+                                    // else 
+                                    //     echo $row['payment_method'];
                                 ?>
                             </td>
                             <td><?=$row['amount']?></td>
