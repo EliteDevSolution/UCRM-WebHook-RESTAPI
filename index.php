@@ -231,7 +231,15 @@
             
             <div class="card-body">
                 <h3 class="mb-3 item-hide">Impresión de archivos: Mi lista de diseños</h3>
-               
+                <?php if($_SESSION['success']) { ?>
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    El pago se registró correctamente.
+                </div>
+                <?php } ?>
+                sdfsdkljf sdklfjsdkl klj
                 <table id="datatable" class="table dt-responsive nowrap w-100">
                     <thead>
                     <tr>
