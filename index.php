@@ -89,7 +89,7 @@
                         {
                             $_SESSION['user'] = ['id'=>$res_user[0]['id'], 'name' =>$res_user[0]['firstName'].' '.$res_user[0]['lastName'], 'email'=>$res_user[0]['username']];
                             $_SESSION['user_valid'] = 'success';
-                            $res = getData($connection, "SELECT CONCAT(T2.name,'(', T2.email ,')') AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
+                            $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
                             $authOk = 1;
                             break;
                         }
