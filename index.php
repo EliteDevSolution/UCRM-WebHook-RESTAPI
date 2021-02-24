@@ -86,6 +86,8 @@
     {
         $res = getData($connection, "SELECT CONCAT(T2.name,'(', T2.email ,')') AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
     }
+    var_dump($res);
+    exit;
 ?>
 
 <!DOCTYPE html>
@@ -315,7 +317,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header" style="border-bottom: 1px solid #e5e8eb;">
-                    <h4 class="modal-title">Informar Pago</h4>
+                    <h4 class="modal-title">Informe de Pagos</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body p-3">
