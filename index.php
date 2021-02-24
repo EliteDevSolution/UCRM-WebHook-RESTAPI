@@ -268,7 +268,6 @@
                                     if(strpos(strtoupper($row['payment_method']), 'CHECK') !== false || strpos($row['payment_method'], 'Cheque') !== false)
                                         echo "Cheque";
                                 ?>
-                                sdkl
                             </td>
                             <td><?=$row['amount']?></td>
                             <td><?=str_replace('Nubmer:', '', $row['invoice_data'])?></td>
