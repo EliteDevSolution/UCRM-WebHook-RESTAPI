@@ -231,14 +231,7 @@
             
             <div class="card-body">
                 <h3 class="mb-3 item-hide">Impresión de archivos: Mi lista de diseños</h3>
-                <?php if($_SESSION['success']) { ?>
-                <div class="alert alert-success alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                    El pago se registró correctamente.
-                </div>
-                <?php } ?>
+               
                 <table id="datatable" class="table dt-responsive nowrap w-100">
                     <thead>
                     <tr>
@@ -410,25 +403,25 @@
             $(".alert").slideUp(500);
         });
 
-        // $("#datatable").DataTable({
-        //     language:{
-        //         paginate:{ 
-        //             previous:"<i class='mdi mdi-chevron-left'>",
-        //             next:"<i class='mdi mdi-chevron-right'>"
-        //         },
-        //         infoEmpty: "No hay registros disponibles",
-        //         info: "Demostración _START_ a _END_ de _TOTAL_ entradas",
-        //         search: "Buscar:",
-        //         lengthMenu: "Show _MENU_ entradas",
-        //         zeroRecords: "No hay datos disponibles en la tabla",
-        //     },
-        //     drawCallback:function(){
-        //         $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
-        //     },
-        //     initComplete: function(settings, json) {
-        //         $('#datatable').show();
-        //     }
-        // });
+        $("#datatable").DataTable({
+            language:{
+                paginate:{ 
+                    previous:"<i class='mdi mdi-chevron-left'>",
+                    next:"<i class='mdi mdi-chevron-right'>"
+                },
+                infoEmpty: "No hay registros disponibles",
+                info: "Demostración _START_ a _END_ de _TOTAL_ entradas",
+                search: "Buscar:",
+                lengthMenu: "Show _MENU_ entradas",
+                zeroRecords: "No hay datos disponibles en la tabla",
+            },
+            drawCallback:function(){
+                $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+            },
+            initComplete: function(settings, json) {
+                $('#datatable').show();
+            }
+        });
 
         
         new Switchery(document.getElementById('pay_send_receipt'),{ color: '#41b7f1' });
