@@ -72,14 +72,27 @@
         if(isset($_POST['email']) && $_POST['email'] != '') {
             $url = "$ucrm_api_url/clients?email={$_POST['email']}";
             $res_user = fetchApiData($url, $ucrm_api_token);
+            $password = $_POST['password'];
+            $_SESSION['email'] = $_POST['email'];
             if(sizeof($res_user) == 0)
             {
                 $_SESSION['user_valid'] = 'error';
             } else 
             {
-                $_SESSION['user'] = ['id'=>$res_user[0]['id'], 'name' =>$res_user[0]['firstName'].' '.$res_user[0]['lastName'], 'email'=>$res_user[0]['username']];
-                $_SESSION['user_valid'] = 'success';
-                $res = getData($connection, "SELECT CONCAT(T2.name,'(', T2.email ,')') AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];
+                
+                if(array_key_exists('attributes', $res_user[0]) && sizeof($res_user[0]['attributes']) > 0)
+                {
+                    foreach ($res_user[0]['attributes'] as $val)
+                    {   
+                        if($val['key'] == 'bankTransferCode' && $val['value'] == $password)
+                        {
+                            $_SESSION['user'] = ['id'=>$res_user[0]['id'], 'name' =>$res_user[0]['firstName'].' '.$res_user[0]['lastName'], 'email'=>$res_user[0]['username']];
+                            $_SESSION['user_valid'] = 'success';
+                            $res = getData($connection, "SELECT CONCAT(T2.name,'(', T2.email ,')') AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
+                            break;
+                        }
+                    }
+                }
             }
         }    
     } else 
@@ -286,10 +299,11 @@
                     <div class="d-flex justify-content-center">
                             <img src="./assets/images/logo.png"  width="200"/>
                     </div>
-                    <h4 class="text-center mt-4">Ingrese su usuario (mail)</h4>
+                    <h4 class="text-center mt-4">Informe su transferencia bancaria</h4>
                     <div class="row form-group justify-content-center">
                         <div class="col-md-3">
-                            <input class="form-control" type="email" id="email" name="email" placeholder="Correo electrónico" autofocus required />
+                            <input class="form-control" type="email" id="email" name="email" placeholder="Correo electrónico" autofocus required value="<?=$_SESSION['email'] ?? ''?>"/>
+                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="Código de transferencia" required />
                             <?php 
                                 if(isset( $_SESSION['user_valid']) && $_SESSION['user_valid'] == 'error') { ?>
                                     <p class="text-danger font-weight-bold">* Tu Correo Electrónico es Inválido.</p>
