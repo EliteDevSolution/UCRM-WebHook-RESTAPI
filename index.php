@@ -308,7 +308,7 @@
                     <div class="row form-group justify-content-center">
                         <div class="col-md-3">
                             <input class="form-control" type="email" id="email" name="email" placeholder="Correo electrónico" autofocus required value="<?=$_SESSION['email'] ?? ''?>"/>
-                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="Código de transferencia" required />
+                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="Contraseña" required />
                             <?php 
                                 if(isset( $_SESSION['user_valid']) && $_SESSION['user_valid'] == 'error') { ?>
                                     <p class="text-danger font-weight-bold">* Tu Correo Electrónico es Inválido.</p>
