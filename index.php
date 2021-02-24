@@ -211,11 +211,12 @@
 
 <body>
 <!-- Pre-loader -->
-<div id="preloader">
+<!-- <div id="preloader">
     <div id="status">
         <div class="spinner">Loading...</div>
     </div>
-</div>
+</div> -->
+
 <!-- End Preloader-->
 <div class="row mt-3">
     <div class="col-md-11 m-auto" style="background: white;">
