@@ -86,8 +86,6 @@
     {
         $res = getData($connection, "SELECT CONCAT(T2.name,'(', T2.email ,')') AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
     }
-    var_dump($res);
-    exit;
 ?>
 
 <!DOCTYPE html>
@@ -412,25 +410,25 @@
             $(".alert").slideUp(500);
         });
 
-        $("#datatable").DataTable({
-            language:{
-                paginate:{ 
-                    previous:"<i class='mdi mdi-chevron-left'>",
-                    next:"<i class='mdi mdi-chevron-right'>"
-                },
-                infoEmpty: "No hay registros disponibles",
-                info: "Demostración _START_ a _END_ de _TOTAL_ entradas",
-                search: "Buscar:",
-                lengthMenu: "Show _MENU_ entradas",
-                zeroRecords: "No hay datos disponibles en la tabla",
-            },
-            drawCallback:function(){
-                $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
-            },
-            initComplete: function(settings, json) {
-                $('#datatable').show();
-            }
-        });
+        // $("#datatable").DataTable({
+        //     language:{
+        //         paginate:{ 
+        //             previous:"<i class='mdi mdi-chevron-left'>",
+        //             next:"<i class='mdi mdi-chevron-right'>"
+        //         },
+        //         infoEmpty: "No hay registros disponibles",
+        //         info: "Demostración _START_ a _END_ de _TOTAL_ entradas",
+        //         search: "Buscar:",
+        //         lengthMenu: "Show _MENU_ entradas",
+        //         zeroRecords: "No hay datos disponibles en la tabla",
+        //     },
+        //     drawCallback:function(){
+        //         $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+        //     },
+        //     initComplete: function(settings, json) {
+        //         $('#datatable').show();
+        //     }
+        // });
 
         
         new Switchery(document.getElementById('pay_send_receipt'),{ color: '#41b7f1' });
