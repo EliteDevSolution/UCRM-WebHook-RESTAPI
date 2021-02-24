@@ -102,7 +102,7 @@
         }    
     } else 
     {
-        $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
+        $res = getData($connection, "SELECT CONCAT(T2.name,'(', T2.email ,')') AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
     }
 ?>
 
@@ -241,7 +241,7 @@
         <?php if(isset($_SESSION['user']) && !isset($_POST['logout'])) { ?>
         <div class="card card-box-shadow mt-3">
             <div class="ml-3 mt-3">
-                <button class="btn btn-outline-info waves-effect waves-light btn-rounded" id="btn_add"> <i class="fe-plus"></i>Agregar pago </button> <span class="ml-1 font-weight-bold font-16"><?=$_SESSION['user']['name']?>(<?=$_SESSION['user']['email']?>)</span>
+                <button class="btn btn-outline-info waves-effect waves-light btn-rounded" id="btn_add"> <i class="fe-plus"></i>Agregar pago </button> <span class="ml-1 font-weight-bold font-16"><?=$_SESSION['user']['name']?></span>
                 <form method="post" class="float-right">
                     <button name="logout" type="submit" class="btn btn-danger mr-3 btn-rounded waves-effect btn-sm waves-light float-right" id='btn-logout' value="logout"> <i class="fe-power"></i></button>
                 </form>
