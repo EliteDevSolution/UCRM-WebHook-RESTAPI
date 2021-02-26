@@ -42,7 +42,7 @@
         if($amount == 0) die('Amount Error!');
 
         $sendJson = json_encode([
-            "currencyCode" => "USD",
+            "currencyCode" => "ARS",
             "applyToInvoicesAutomatically" => true,
             "invoiceIds" => $invoiceIds,
             "clientId" => $clientId,
