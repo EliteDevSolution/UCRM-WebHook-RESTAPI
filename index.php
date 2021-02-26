@@ -85,7 +85,7 @@
                     foreach ($res_user[0]['attributes'] as $val)
                     {   
                         $authOk = 0;
-                        if($val['key'] == 'bankTransferCode' && $val['value'] == $password)
+                        if($val['key'] == 'cDigoDeTransferencia' && $val['value'] == $password)
                         {
                             $_SESSION['user'] = ['id'=>$res_user[0]['id'], 'name' =>$res_user[0]['firstName'].' '.$res_user[0]['lastName'], 'email'=>$res_user[0]['username']];
                             $_SESSION['user_valid'] = 'success';
