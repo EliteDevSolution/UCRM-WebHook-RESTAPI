@@ -269,9 +269,9 @@
     
 <!-- End Preloader-->
 <?php if($_SESSION['show_modal']==true){ ?>
-    <input type="text" id="show-modal" value="show modal">
+    <input type="text" id="show-modal" value="show modal" style="display: none;">
 <?php $_SESSION['show_modal'] = false; } else{ ?>
-    <input type="text" id="show-modal" value="hide modal">
+    <input type="text" id="show-modal" value="hide modal" style="display: none;">
 <?php } ?>
 
 <div class="row mt-3">
