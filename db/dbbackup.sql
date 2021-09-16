@@ -49,6 +49,12 @@ CREATE TABLE `payment_methods` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `file_data` (
+  `trans_id` bigint(10) NOT NULL,
+  `file_name` varchar(200) NOT NULL,
+  `file_create_date` date NOT NULL,
+  PRIMARY KEY (`trans_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4
 
 
 

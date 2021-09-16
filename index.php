@@ -5,7 +5,7 @@
     session_start();
     $res = [];
     $_SESSION['success'] = false;
-    
+
     if(isset($_POST['logout']) && $_POST['logout'] == 'logout')
     {
         session_destroy();        
@@ -32,6 +32,12 @@
     
     if(isset($_POST['add_payment']) && $_POST['add_payment'] == 'add_payment')
     {
+
+        $uploadOk = 1;
+
+        $file_new_name = "";
+        $file_create_date = "";
+        
         $invoiceIds = $_POST['pay_invoices'] ?? [];
         $amount = floatval($_POST['pay_amount']);
         $clientId = $_SESSION['user']['id'];
@@ -40,6 +46,7 @@
         $note = $_POST['pay_note'];
         $sendReceipt = $_POST['pay_send_receipt'] ?? 'off';
         if($amount == 0) die('Amount Error!');
+        
 
         $sendJson = json_encode([
             "currencyCode" => "ARS",
@@ -50,12 +57,29 @@
             "createdDate" => $createdDate,
             "amount" => $amount,
             "note" => $note,
-            "providerPaymentTime" => $createdDate
+            "providerPaymentTime" => $createdDate,
         ]);
         
         $postUrl = "$ucrm_api_url/payments";
         $res = postDataApi($postUrl, $ucrm_api_token, $sendJson);
-        if(array_key_exists('id', $res)) $_SESSION['success'] = true;
+        
+        if(array_key_exists('id', $res)) {
+            $_SESSION['success'] = true;
+            if($_FILES["photo"]["size"]>0){          
+
+                $target_dir = "upload/";
+                $resId = $res['id'];
+                $file_new_name = date("YmdHis") . basename($_FILES["photo"]["name"]);
+                $target_file = $target_dir . $file_new_name;
+                $fileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+                $fileCreateDate = date('Y-m-d');
+    
+                if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
+                    $insertQuery = "Insert into file_data values('$resId', '$file_new_name', '$fileCreateDate')";
+                    insertData($connection, $insertQuery);
+                } 
+            }
+        }
 
         if($sendReceipt == "on" && array_key_exists('id', $res))
         {
@@ -89,11 +113,13 @@
                         {
                             $_SESSION['user'] = ['id'=>$res_user[0]['id'], 'name' =>$res_user[0]['firstName'].' '.$res_user[0]['lastName'], 'email'=>$res_user[0]['username']];
                             $_SESSION['user_valid'] = 'success';
-                            $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
+                            $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.trans_id, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
                             $authOk = 1;
                             break;
                         }
                     }
+                    $_SESSION['show_modal'] = true;
+
                     if($authOk == 0) $_SESSION['user_valid'] = 'error';
                 } else {
                     $_SESSION['user_valid'] = 'error';
@@ -102,15 +128,18 @@
         }    
     } else 
     {
-        $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
+        $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.trans_id, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
     }
+    $file_data = get_file_data($connection, 'SELECT * FROM file_data');
+    
+    // exit;
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Payment History from UCRM WebHook</title>
+    <title>Oops SRL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Payment History" name="description" />
     <meta content="Coderthemes" name="author" />
@@ -138,6 +167,8 @@
     <link href="./assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
     <!-- Block Ui -->
     <link href="./assets/libs/blockui/blockUI.css" rel="stylesheet" type="text/css" />
+    <!-- Dropify Ui -->
+    <link href="./assets/libs/dropify/dropify.min.css" rel="stylesheet" type="text/css" />
     <!-- Preloader Ui -->
     <link href="./assets/css/preloader.min.css" rel="stylesheet" type="text/css" />
     <style>
@@ -224,25 +255,31 @@
         .page-item.active .page-link {
             background-color: #00bcd4 !important;
         }
+
+        .dropzone {
+            border: 2px dashed rgb(65, 65, 149);
+            max-height: 400px;	
+            padding: 0px 20px !important;    
+        }
     </style>
 </head>
 
 <body>
-<!-- Pre-loader -->
-<!-- <div id="preloader">
-    <div id="status">
-        <div class="spinner">Loading...</div>
-    </div>
-</div> -->
-
+    
 <!-- End Preloader-->
+<?php if($_SESSION['show_modal']==true){ ?>
+    <input type="text" id="show-modal" value="show modal">
+<?php $_SESSION['show_modal'] = false; } else{ ?>
+    <input type="text" id="show-modal" value="hide modal">
+<?php } ?>
+
 <div class="row mt-3">
     <div class="col-md-11 m-auto" style="background: white;">
         <?php if(isset($_SESSION['user']) && !isset($_POST['logout'])) { ?>
         <div class="card card-box-shadow mt-3">
             <div class="ml-3 mt-3">
                 <button class="btn btn-outline-info waves-effect waves-light btn-rounded" id="btn_add"> <i class="fe-plus"></i>Agregar pago </button> <span class="ml-1 font-weight-bold font-16"><?=$_SESSION['user']['name']?></span>
-                <form method="post" class="float-right">
+                <form method="post" class="float-right" id="main-body">
                     <button name="logout" type="submit" class="btn btn-danger mr-3 btn-rounded waves-effect btn-sm waves-light float-right" id='btn-logout' value="logout"> <i class="fe-power"></i></button>
                 </form>
             </div>
@@ -264,9 +301,9 @@
                             <th>Cliente</th>
                             <th>Método de pago</th>
                             <th>Cantidad</th>
-                            <th>Datos de facturación</th>
                             <th>Fecha de realización</th>
                             <th>Nota</th>
+                            <th>Arquivo</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -279,7 +316,7 @@
                             <td><?=$row['client_info']?></td>
                             <td>
                                 <?php
-                                    if(strpos(strtoupper($row['payment_method']), 'BANK TRANSFER') !== false || strpos($row['payment_method'], 'Transferencia bancaria') !== false)
+                                    if(strpos(strtoupper($row['payment_method']), 'BANK TRANSFER') !== false || strpos($row['payment_method'], 'Transferencia Bancaria') !== false)
                                         echo "Transferencia bancaria";
                                     if(strpos(strtoupper($row['payment_method']), 'CASH') !== false || strpos($row['payment_method'], 'Efectivo') !== false)
                                         echo "Efectivo";
@@ -288,9 +325,35 @@
                                 ?>
                             </td>
                             <td><?=$row['amount']?></td>
-                            <td><?=str_replace('Nubmer:', '', $row['invoice_data'])?></td>
                             <td><?=str_replace('T',' ', substr($row['created_date'], 0, 19))?></td>
                             <td><?=$row['note']?></td>
+                            <td style="text-align:center;">
+                                <?php
+                                    if(isset($file_data[$row["trans_id"]]))
+                                    {
+                                        foreach($file_data[$row['trans_id']] as $row_file)
+                                        {
+                                            $file_name_array = explode(".", $row_file['file_name']);
+                                            $file_type = $file_name_array[count($file_name_array)-1];
+                                            if($file_type =="pdf")
+                                            { ?>
+                                                <a href="./upload/<?= $row_file['file_name'] ?>" target="_blank">
+                                                    <img src="./assets/images/pdf_1.png"  width="26" height="30" title="<?= $row_file['file_name'] ?>"/>
+                                                </a>
+                                            <?php }else
+                                            { ?>
+                                                <a href="./upload/<?= $row_file['file_name'] ?>" target="_blank">
+                                                    <img src="./assets/images/img_1.png"  width="24" height="30" title="<?= $row_file['file_name'] ?>"/>
+                                            </a>
+                                            <?php }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        echo "Nenhum arquivo";
+                                    }
+                                ?>
+                            </td>
                         </tr>
                     <?php } ?>
                     </tbody>
@@ -299,7 +362,7 @@
         </div> <!-- end card -->
         <?php } else { ?>
         <div>
-            <form method="post">
+            <form method="post" id="login-body">
                 <div style="margin-top:20vh;">
                     <div class="d-flex justify-content-center">
                             <img src="./assets/images/logo.png"  width="200"/>
@@ -308,7 +371,7 @@
                     <div class="row form-group justify-content-center">
                         <div class="col-md-3">
                             <input class="form-control" type="email" id="email" name="email" placeholder="Correo electrónico" autofocus required value="<?=$_SESSION['email'] ?? ''?>"/>
-                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="Contraseña" required />
+                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="contraseña WIFI" required />
                             <?php 
                                 if(isset( $_SESSION['user_valid']) && $_SESSION['user_valid'] == 'error') { ?>
                                     <p class="text-danger font-weight-bold">* Tu Correo Electrónico es Inválido.</p>
@@ -327,7 +390,7 @@
         <?php } ?>    
     </div>
 </div>
-<form method="post">
+<form method="post" enctype="multipart/form-data" id="modal_form">
     <div id="payment_add_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -341,7 +404,7 @@
                             <label for="field-1" class="control-label">Monto <span class="text-danger">*</span></label>
                         </div>
                         <div class="col-md-5">
-                            <input type="number" class="form-control" min="0.001" max="10000000" step="0.001" name="pay_amount" id="pay_amount" placeholder="" required>
+                            <input type="number" class="form-control" min="100" max="10000000" step="0.01" name="pay_amount" id="pay_amount" placeholder="" required>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -374,7 +437,7 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-md-4">
-                            <label for="field-1" class="control-label">Nota</label>
+                            <label for="field-1" class="control-label">Adjuntar comprobante</label>
                         </div>
                         <div class="col-md-8">
                             <textarea class="form-control" rows="3" name="pay_note" id="pay_note" placeholder="Escribe algo sobre la nota"></textarea>
@@ -389,9 +452,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-group" style="padding:10px;">
+                    <div class="col-md-12">
+                        <label>Arquivo de comprovante de pagamento</label>
+                        <input type="file" name="photo" class="dropify" id="file_data"
+                        data-allowed-file-extensions="jpg png gif tif jpeg pdf" data-max-file-size="50M" />
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-blue waves-effect waves-light">Salvar</button>
+                    <button type="submit" class="btn btn-blue waves-effect waves-light">Guardar</button>
                     <input type="hidden" name="add_payment" value="add_payment">
                 </div>
             </div>
@@ -415,14 +485,21 @@
 <script src="./assets/libs/flatpickr/lang/es.min.js"></script>
 <script src="./assets/libs/toastr/toastr.min.js"></script>
 <script src="./assets/libs/blockui/blockUI.js"></script>
-
-
+<script src="./assets/libs/dropify/dropify.min.js"></script>
 <!-- third party js ends -->
 
 <!-- App js -->
 <script src="./assets/js/app.min.js"></script>
 <script>
     $(document).ready(function(){
+
+        $("#show-modal").hide();      
+
+        if($("#show-modal").val() == "show modal"){
+            modal_data_load();
+        }
+        
+            
         $(".alert").fadeTo(4000, 500).slideUp(500, function(){
             $(".alert").slideUp(500);
         });
@@ -449,6 +526,7 @@
 
         
         new Switchery(document.getElementById('pay_send_receipt'),{ color: '#41b7f1' });
+        $('#pay_send_receipt').click();
         
         $('#pay_created_date').flatpickr({
             enableTime: true,
@@ -459,7 +537,7 @@
             appendTo: document.getElementById('picker_container')
         });
 
-        $('#btn_add').click(() => {
+        function modal_data_load(){
             UIBlock('bars4');
             $('#pay_payment_method').empty();
             $('#pay_invoices').empty();
@@ -478,10 +556,16 @@
                 $.post("/",{ajax_type: 'invoices'}, function () {
                 }).done(function(res) {
                     let invoicesList = JSON.parse(res);
+                    var i = 1;
                     invoicesList.forEach(val => {
-                        $('#pay_invoices').append(`<option value='${val.id}'>${val.number} (${val.amountToPay}${val.currencyCode})</option>`);
+                        if(i == 1)
+                            $('#pay_invoices').append(`<option value='${val.id}'  selected>${val.number} (${val.amountToPay}${val.currencyCode})</option>`);
+                        else
+                            $('#pay_invoices').append(`<option value='${val.id}'>${val.number} (${val.amountToPay}${val.currencyCode})</option>`);
+                        i++;
                     });
                     $('#pay_invoices').select2();
+                    
                     $('#payment_add_modal').modal({backdrop: 'static', keyboard: false});
                     UnBlockUi();
                 }).fail(function(res) {
@@ -490,7 +574,17 @@
             }).fail(function(res) {
                 UnBlockUi();
             });
-            
+        }
+
+        $('#btn_add').click(function(){
+            modal_data_load();            
+        });
+
+        $('.dropify').dropify({
+            messages: {
+                'default': '',
+                'error':   'type error ',
+            }
         });
     });
 
