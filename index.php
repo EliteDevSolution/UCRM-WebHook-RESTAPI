@@ -5,6 +5,7 @@
     session_start();
     $res = [];
     $_SESSION['success'] = false;
+    $_SESSION['show_modal'] = false;
 
     if(isset($_POST['logout']) && $_POST['logout'] == 'logout')
     {
