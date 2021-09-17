@@ -6,7 +6,7 @@
     $res = [];
     $_SESSION['success'] = false;
     $_SESSION['show_modal'] = false;
-
+    setlocale(LC_MONETARY, 'es_AR');
     if(isset($_POST['logout']) && $_POST['logout'] == 'logout')
     {
         session_destroy();        
@@ -44,7 +44,7 @@
         $clientId = $_SESSION['user']['id'];
         $methodId = $_POST['pay_payment_method'];
         $createdDate = date( "Y-m-d\TH:i:s+0000", strtotime($_POST['pay_created_date']));
-        $note = $_POST['pay_note'];
+        $note = "";
         $sendReceipt = $_POST['pay_send_receipt'] ?? 'off';
         if($amount == 0) die('Amount Error!');
         
@@ -114,7 +114,7 @@
                         {
                             $_SESSION['user'] = ['id'=>$res_user[0]['id'], 'name' =>$res_user[0]['firstName'].' '.$res_user[0]['lastName'], 'email'=>$res_user[0]['username']];
                             $_SESSION['user_valid'] = 'success';
-                            $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.trans_id, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
+                            $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, T1.amount AS amount, T1.invoice_data, T1.created_date, T1.trans_id, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_POST['email']}' ORDER BY T1.created_date DESC") ?? [];            
                             $authOk = 1;
                             break;
                         }
@@ -129,11 +129,9 @@
         }    
     } else 
     {
-        $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, CONCAT(T1.amount,T1.currency) AS amount, T1.invoice_data, T1.created_date, T1.trans_id, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
+        $res = getData($connection, "SELECT T2.name AS client_info, T3.name AS payment_method, T1.amount AS amount, T1.invoice_data, T1.created_date, T1.trans_id, T1.note FROM payment_history AS T1 LEFT JOIN clients AS T2 ON(T1.client_id = T2.id) LEFT JOIN payment_methods AS T3 ON(T1.payment_method_id=T3.id) WHERE email='{$_SESSION['user']['email']}' ORDER BY T1.created_date DESC") ?? [];
     }
     $file_data = get_file_data($connection, 'SELECT * FROM file_data');
-    
-    // exit;
 ?>
 
 <!DOCTYPE html>
@@ -303,7 +301,7 @@
                             <th>Método de pago</th>
                             <th>Cantidad</th>
                             <th>Fecha de realización</th>
-                            <th>Nota</th>
+                            <!-- <th>Nota</th> -->
                             <th>Arquivo</th>
                         </tr>
                     </thead>
@@ -325,9 +323,14 @@
                                         echo "Cheque";
                                 ?>
                             </td>
-                            <td><?=$row['amount']?></td>
+                            <td>
+                                <?php
+                                    $fmt = numfmt_create( 'es_AR', NumberFormatter::CURRENCY );
+                                    echo numfmt_format_currency($fmt, floatval($row["amount"]), "ARS");
+                                ?>
+                            </td>
                             <td><?=str_replace('T',' ', substr($row['created_date'], 0, 19))?></td>
-                            <td><?=$row['note']?></td>
+                            <!-- <td><?=$row['note']?></td> -->
                             <td style="text-align:center;">
                                 <?php
                                     if(isset($file_data[$row["trans_id"]]))
@@ -372,7 +375,7 @@
                     <div class="row form-group justify-content-center">
                         <div class="col-md-3">
                             <input class="form-control" type="email" id="email" name="email" placeholder="Correo electrónico" autofocus required value="<?=$_SESSION['email'] ?? ''?>"/>
-                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="contraseña WIFI" required />
+                            <input class="form-control mt-1" type="password" id="password" name="password" placeholder="Contraseña WIFI" required />
                             <?php 
                                 if(isset( $_SESSION['user_valid']) && $_SESSION['user_valid'] == 'error') { ?>
                                     <p class="text-danger font-weight-bold">* Tu Correo Electrónico es Inválido.</p>
@@ -391,6 +394,7 @@
         <?php } ?>    
     </div>
 </div>
+
 <form method="post" enctype="multipart/form-data" id="modal_form">
     <div id="payment_add_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog">
@@ -404,8 +408,11 @@
                         <div class="col-md-4">
                             <label for="field-1" class="control-label">Monto <span class="text-danger">*</span></label>
                         </div>
-                        <div class="col-md-5">
-                            <input type="number" class="form-control" min="100" max="10000000" step="0.01" name="pay_amount" id="pay_amount" placeholder="" required>
+                        <div class="col-md-8">
+                            <input type="text" name="pay_amount_edit" id="pay_amount_edit" class="form-control" oninput="converter(this.value)" required>
+
+                            <input type="number" class="form-control" min="100" max="10000000" step="0.01" name="pay_amount" id="pay_amount" placeholder="" style="display:none;" required>
+                            <!-- <input type="number" class="form-control" min="100" max="10000000" step="0.01" name="pay_amount" id="pay_amount" placeholder="" required> -->
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -436,14 +443,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <!-- <div class="row mt-2" >
                         <div class="col-md-4">
                             <label for="field-1" class="control-label">Adjuntar comprobante</label>
                         </div>
                         <div class="col-md-8">
                             <textarea class="form-control" rows="3" name="pay_note" id="pay_note" placeholder="Escribe algo sobre la nota"></textarea>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row mt-2">
                         <div class="col-md-4">
                             <label for="field-1" class="control-label">Enviar recibo</label>
@@ -455,14 +462,15 @@
                 </div>
                 <div class="form-group" style="padding:10px;">
                     <div class="col-md-12">
-                        <label>Arquivo de comprovante de pagamento</label>
+                        <label>Comprobante de Transferencia</label>
                         <input type="file" name="photo" class="dropify" id="file_data"
                         data-allowed-file-extensions="jpg png gif tif jpeg pdf" data-max-file-size="50M" />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-blue waves-effect waves-light">Guardar</button>
+                    <button type="button" id="payment_btn" class="btn btn-blue waves-effect waves-light">Guardar</button>
+                    <button type="submit" id="submit_btn" class="btn btn-blue waves-effect waves-light" style="display:none;"></button>
                     <input type="hidden" name="add_payment" value="add_payment">
                 </div>
             </div>
@@ -492,7 +500,46 @@
 <!-- App js -->
 <script src="./assets/js/app.min.js"></script>
 <script>
+    function setInputFilter(textbox, inputFilter) {
+    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+        textbox.addEventListener(event, function() {
+        if (inputFilter(this.value)) {
+            this.oldValue = this.value;
+            this.oldSelectionStart = this.selectionStart;
+            this.oldSelectionEnd = this.selectionEnd;
+        } else if (this.hasOwnProperty("oldValue")) {
+            this.value = this.oldValue;
+            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+        } else {
+            this.value = "";
+        }
+        });
+    });
+    }
+
+    function converter(value){
+
+        if(value == ",") $("#pay_amount_edit").val("");
+
+        if(value == ""){
+            $("#pay_amount").val(0);
+            return 0;
+        }
+
+        if(value.substr(0, 1)==",")
+            value = value.substr(1);
+        
+        value = value.replace(",", ".");
+        $("#pay_amount").val(Number(value));
+    }
+
     $(document).ready(function(){
+        
+        var pay_invoices_array = [];
+
+        setInputFilter(document.getElementById("pay_amount_edit"), function(value) {
+            return /^\d*[,]?\d*$/.test(value); 
+        });
 
         $("#show-modal").hide();      
 
@@ -504,6 +551,43 @@
         $(".alert").fadeTo(4000, 500).slideUp(500, function(){
             $(".alert").slideUp(500);
         });
+
+        $("#payment_btn").click(function(){
+            var i = 0;
+            var pay_invoice = $("#pay_invoices").val();
+            var total_amount = 0;
+
+            for(i = 0 ; i<pay_invoice.length ; i++){
+                total_amount += Number(pay_invoices_array[pay_invoice[i]]);
+            }
+
+            toastr.options = {
+                "closeButton": true,
+                "newestOnTop": false,
+                "progressBar": true,
+                // "positionClass": "toast-bottom-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+            if($("#pay_amount").val()<total_amount){
+
+                $('#pay_amount_edit').focus();
+                toastr.warning("O valor do pagamento não deve ser inferior à fatura.");
+            }
+            else{
+                $("#submit_btn").click(); 
+            }            
+        });
+        
 
         $("#datatable").DataTable({
             language:{
@@ -559,10 +643,14 @@
                     let invoicesList = JSON.parse(res);
                     var i = 1;
                     invoicesList.forEach(val => {
+                        let realCurrenyVal = val.amountToPay.toLocaleString('es-ar', {style: 'currency',currency: 'ARS'});
                         if(i == 1)
-                            $('#pay_invoices').append(`<option value='${val.id}'  selected>${val.number} (${val.amountToPay}${val.currencyCode})</option>`);
+                            $('#pay_invoices').append(`<option value='${val.id}'  selected>${val.number} (${realCurrenyVal})</option>`);
                         else
-                            $('#pay_invoices').append(`<option value='${val.id}'>${val.number} (${val.amountToPay}${val.currencyCode})</option>`);
+                            $('#pay_invoices').append(`<option value='${val.id}'>${val.number} (${realCurrenyVal})</option>`);
+                            
+                        pay_invoices_array[val.id] = val.amountToPay;
+
                         i++;
                     });
                     $('#pay_invoices').select2();

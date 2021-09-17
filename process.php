@@ -5,6 +5,13 @@
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
 
+    function money_currency($str)
+    {
+        setlocale(LC_MONETARY, 'en_US');
+        return money_format('%i', floatval($str));
+        setlocale(LC_MONETARY, 'es_AR');
+    }
+
     function insertData($conn, $sql)
     {
         mysqli_query($conn, $sql);
