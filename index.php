@@ -301,7 +301,6 @@
                             <th>Método de pago</th>
                             <th>Cantidad</th>
                             <th>Fecha de realización</th>
-                            <!-- <th>Nota</th> -->
                             <th>Arquivo</th>
                         </tr>
                     </thead>
@@ -330,7 +329,6 @@
                                 ?>
                             </td>
                             <td><?=str_replace('T',' ', substr($row['created_date'], 0, 19))?></td>
-                            <!-- <td><?=$row['note']?></td> -->
                             <td style="text-align:center;">
                                 <?php
                                     if(isset($file_data[$row["trans_id"]]))
@@ -442,14 +440,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="row mt-2" >
-                        <div class="col-md-4">
-                            <label for="field-1" class="control-label">Adjuntar comprobante</label>
-                        </div>
-                        <div class="col-md-8">
-                            <textarea class="form-control" rows="3" name="pay_note" id="pay_note" placeholder="Escribe algo sobre la nota"></textarea>
-                        </div>
-                    </div> -->
                     <div class="row mt-2">
                         <div class="col-md-4">
                             <label for="field-1" class="control-label">Enviar recibo</label>
@@ -461,7 +451,7 @@
                 </div>
                 <div class="form-group" style="padding:10px;">
                     <div class="col-md-12">
-                        <label>Comprobante de Transferencia</label>
+                        <label>Archivo</label>
                         <input type="file" name="photo" class="dropify" id="file_data"
                         data-allowed-file-extensions="jpg png gif tif jpeg pdf" data-max-file-size="50M" />
                     </div>
@@ -581,15 +571,15 @@
             if($("#pay_amount").val()<total_amount){
 
                 $('#pay_amount_edit').focus();
-                toastr.warning("O valor do pagamento não deve ser inferior à fatura.");
+                toastr.warning("Verifique el monto transferido, no puede ser menor al valor de la/las facturas.");
                 return ;
             }
 
             if(upload_file_data.files.length == 0){
-                toastr.warning("Deve ter Comprobante de Transferencia.");
+                toastr.warning("Por favor adjunte su comprobante de transferencia.");
                 return ;
             }
-            
+
             $("#submit_btn").click();             
         });
         
@@ -646,17 +636,11 @@
                 $.post("/",{ajax_type: 'invoices'}, function () {
                 }).done(function(res) {
                     let invoicesList = JSON.parse(res);
-                    var i = 1;
                     invoicesList.forEach(val => {
                         let realCurrenyVal = val.amountToPay.toLocaleString('es-ar', {style: 'currency',currency: 'ARS'});
-                        if(i == 1)
                             $('#pay_invoices').append(`<option value='${val.id}'  selected>${val.number} (${realCurrenyVal})</option>`);
-                        else
-                            $('#pay_invoices').append(`<option value='${val.id}'>${val.number} (${realCurrenyVal})</option>`);
                             
                         pay_invoices_array[val.id] = val.amountToPay;
-
-                        i++;
                     });
                     $('#pay_invoices').select2();
                     
