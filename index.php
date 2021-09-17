@@ -301,7 +301,7 @@
                             <th>Método de pago</th>
                             <th>Cantidad</th>
                             <th>Fecha de realización</th>
-                            <th>Arquivo</th>
+                            <th>Comprobante de transferencia</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -451,7 +451,7 @@
                 </div>
                 <div class="form-group" style="padding:10px;">
                     <div class="col-md-12">
-                        <label>Archivo</label>
+                        <label>Comprobante de transferencia</label>
                         <input type="file" name="photo" class="dropify" id="file_data"
                         data-allowed-file-extensions="jpg png gif tif jpeg pdf" data-max-file-size="50M" />
                     </div>
