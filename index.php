@@ -412,7 +412,6 @@
                             <input type="text" name="pay_amount_edit" id="pay_amount_edit" class="form-control" oninput="converter(this.value)" required>
 
                             <input type="number" class="form-control" min="100" max="10000000" step="0.01" name="pay_amount" id="pay_amount" placeholder="" style="display:none;" required>
-                            <!-- <input type="number" class="form-control" min="100" max="10000000" step="0.01" name="pay_amount" id="pay_amount" placeholder="" required> -->
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -577,15 +576,21 @@
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
             }
+            const upload_file_data = document.getElementById("file_data");
 
             if($("#pay_amount").val()<total_amount){
 
                 $('#pay_amount_edit').focus();
                 toastr.warning("O valor do pagamento não deve ser inferior à fatura.");
+                return ;
             }
-            else{
-                $("#submit_btn").click(); 
-            }            
+
+            if(upload_file_data.files.length == 0){
+                toastr.warning("Deve ter Comprobante de Transferencia.");
+                return ;
+            }
+            
+            $("#submit_btn").click();             
         });
         
 
