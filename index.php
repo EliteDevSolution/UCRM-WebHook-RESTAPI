@@ -119,9 +119,9 @@
                             break;
                         }
                     }
-                    $_SESSION['show_modal'] = true;
 
                     if($authOk == 0) $_SESSION['user_valid'] = 'error';
+                    else $_SESSION['show_modal'] = true;
                 } else {
                     $_SESSION['user_valid'] = 'error';
                 }
@@ -376,7 +376,7 @@
                             <input class="form-control mt-1" type="password" id="password" name="password" placeholder="Contraseña WIFI" required />
                             <?php 
                                 if(isset( $_SESSION['user_valid']) && $_SESSION['user_valid'] == 'error') { ?>
-                                    <p class="text-danger font-weight-bold">* Tu Correo Electrónico es Inválido.</p>
+                                    <p class="text-danger font-weight-bold">* Verifique su correo y su contraseña</p>
                             <?php } ?>
                             <div class="justify-content-center d-flex mt-1">
                                 <button class="btn btn-outline-info waves-effect waves-light w-100" type="submit" id="btn_submit">
