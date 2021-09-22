@@ -452,7 +452,7 @@
                 <div class="form-group" style="padding:10px;">
                     <div class="col-md-12">
                         <label>Comprobante de transferencia</label>
-                        <input type="file" name="photo" class="dropify" id="file_data"
+                        <input type="file" name="photo" class="dropify" id="file_data" data-height="120"
                         data-allowed-file-extensions="jpg png gif tif jpeg pdf" data-max-file-size="50M" />
                     </div>
                 </div>
