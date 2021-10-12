@@ -1,0 +1,12 @@
+[0m2021.09.22 08:36:39 INFO  Started: Metals version 0.10.7 in workspace 'D:\workana\UCRM-WebHook-RESTAPI' for client Visual Studio Code 1.60.0.[0m
+[0m2021.09.22 08:36:40 INFO  time: initialize in 0.63s[0m
+[0m2021.09.22 08:36:44 WARN  Build server is not auto-connectable.[0m
+[0m2021.09.22 08:36:44 WARN  no build tool detected in workspace 'D:\workana\UCRM-WebHook-RESTAPI'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. [0m
+Sep 22, 2021 8:46:12 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+[0m2021.10.12 23:38:18 INFO  Started: Metals version 0.10.7 in workspace 'D:\workana\UCRM-WebHook-RESTAPI' for client Visual Studio Code 1.60.0.[0m
+[0m2021.10.12 23:38:19 INFO  time: initialize in 0.87s[0m
+[0m2021.10.12 23:38:25 WARN  Build server is not auto-connectable.[0m
+[0m2021.10.12 23:38:25 WARN  no build tool detected in workspace 'D:\workana\UCRM-WebHook-RESTAPI'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. [0m
+Oct 13, 2021 12:25:21 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace

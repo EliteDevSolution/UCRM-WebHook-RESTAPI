@@ -458,8 +458,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cancelar</button>
-                    <button type="button" id="payment_btn" class="btn btn-blue waves-effect waves-light">Guardar</button>
-                    <button type="submit" id="submit_btn" class="btn btn-blue waves-effect waves-light" style="display:none;"></button>
+                    <button type="submit" id="submit_btn" class="btn btn-blue waves-effect waves-light">Guardar</button>
                     <input type="hidden" name="add_payment" value="add_payment">
                 </div>
             </div>
@@ -541,7 +540,9 @@
             $(".alert").slideUp(500);
         });
 
-        $("#payment_btn").click(function(){
+        $('#modal_form').submit(function(e){
+            e.preventDefault();
+            const upload_file_data = document.getElementById("file_data");
             var i = 0;
             var pay_invoice = $("#pay_invoices").val();
             var total_amount = 0;
@@ -554,7 +555,6 @@
                 "closeButton": true,
                 "newestOnTop": false,
                 "progressBar": true,
-                // "positionClass": "toast-bottom-right",
                 "preventDuplicates": false,
                 "onclick": null,
                 "showDuration": "300",
@@ -566,7 +566,6 @@
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
             }
-            const upload_file_data = document.getElementById("file_data");
 
             if($("#pay_amount").val()<total_amount){
 
@@ -575,13 +574,22 @@
                 return ;
             }
 
+            if($("#pay_amount").val()>total_amount + 100){
+
+                $('#pay_amount_edit').focus();
+                toastr.warning("Verifique el monto transferido, no puede ser mayor que el valor de la factura + 100.");
+                return ;
+            }
+
             if(upload_file_data.files.length == 0){
                 toastr.warning("Por favor adjunte su comprobante de transferencia.");
                 return ;
             }
 
-            $("#submit_btn").click();             
+            $('#submit_btn').prop('disabled', true);
+            e.currentTarget.submit();
         });
+
         
 
         $("#datatable").DataTable({
