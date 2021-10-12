@@ -577,7 +577,7 @@
             if($("#pay_amount").val()>total_amount + 100){
 
                 $('#pay_amount_edit').focus();
-                toastr.warning("Verifique el monto transferido, no puede ser mayor que el valor de la factura + 100.");
+                toastr.warning("El monto transferido es mayor al total de la/s facturas");
                 return ;
             }
 
