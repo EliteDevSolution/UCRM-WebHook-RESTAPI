@@ -582,7 +582,7 @@
             }
 
             if(upload_file_data.files.length == 0){
-                toastr.warning("Por favor adjunte su comprobante de transferencia.");
+                toastr.warning("El monto informado es mayor al total de la/las facturas");
                 return ;
             }
 
