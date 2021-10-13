@@ -577,12 +577,12 @@
             if($("#pay_amount").val()>total_amount + 100){
 
                 $('#pay_amount_edit').focus();
-                toastr.warning("El monto transferido es mayor al total de la/s facturas");
+                toastr.warning("El monto informado es mayor al total de la/las facturas");
                 return ;
             }
 
             if(upload_file_data.files.length == 0){
-                toastr.warning("El monto informado es mayor al total de la/las facturas");
+                toastr.warning("Por favor adjunte su comprobante de transferencia.");
                 return ;
             }
 
